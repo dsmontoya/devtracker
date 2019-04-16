@@ -1,0 +1,38 @@
+html{
+  width: 400px;
+  height: 600px;
+}
+
+body {
+  margin: 0;
+}
+
+.clock {
+  font-size: 40px;
+  text-align: center;
+}
+
+.tasks{
+  width: 400px;
+  height: 90vh;
+  display: grid;
+  grid-template-columns: auto auto;
+}
+
+.task{
+  text-align: center;
+  margin: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.task.selected{
+  background: #80808026;
+}
+
+.task:hover{
+  background: #80808026;
+  cursor: pointer;
+}
