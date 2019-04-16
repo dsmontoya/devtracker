@@ -65,7 +65,7 @@ Vue.component('stop-watch', {
       clock: {}
     }
   },
-  template: '<div class="clock" v-if="clock.hour"><div v-on:click="stopClock"><img src="stop-48.png"></div><div><span>{{clock.hour}}</span>:<span>{{clock.minute}}</span>:<span>{{clock.second}}</span></div></div>',
+  template: '<div><div class="welcome-message" v-if="!clock.hour"><div>Click on a task</div></div><div class="clock" v-if="clock.hour"><div v-on:click="stopClock"><img src="stop-48.png"></div><div><span>{{clock.hour}}</span>:<span>{{clock.minute}}</span>:<span>{{clock.second}}</span></div></div></div>',
   compute: {
 
   },
