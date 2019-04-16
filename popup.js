@@ -8,6 +8,13 @@ chrome.runtime.onMessage.addListener(function(message,sender,sendResponse){
 	str = JSON.stringify(message.data);
 });
 
+function prettify(unit){
+  if (unit < 10) {
+    return "0"+unit
+  }
+  return ""+unit
+}
+
 Vue.component('tasks', {
   props: ['name','selected-task'],
   template: '<div class="tasks"><task v-for="task in tasks" v-bind:selected-task="selectedTask" @select-task="selectTask" v-bind:key="task.name" :icon="task.icon" :title="task.title" :name="task.name"></task></div>',
@@ -58,13 +65,12 @@ Vue.component('stop-watch', {
       clock: {}
     }
   },
-  template: '<div class="clock" v-if="clock.hour"><span>{{clock.hour}}</span>:<span>{{clock.minute}}</span>:<span>{{clock.second}}</span></div>',
+  template: '<div class="clock" v-if="clock.hour"><div v-on:click="stopClock"><img src="stop-48.png"></div><div><span>{{clock.hour}}</span>:<span>{{clock.minute}}</span>:<span>{{clock.second}}</span></div></div>',
   compute: {
 
   },
   methods: {
     calculateUnit(a,b){
-      console.log("a",a,"b",b);
       var n = a / b
       var m = a % b
       return {div:parseInt(n), mod:m}
@@ -74,13 +80,10 @@ Vue.component('stop-watch', {
       var hourData = this.calculateUnit(this.elapsedTime,3600000)
       var minuteData = this.calculateUnit(hourData.mod,60000)
       var secondData = this.calculateUnit(minuteData.mod,1000)
-      return {hour: this.prettify(hourData.div), minute: this.prettify(minuteData.div), second: this.prettify(secondData.div)}
+      return {hour: prettify(hourData.div), minute: prettify(minuteData.div), second: prettify(secondData.div)}
     },
-    prettify(unit){
-      if (unit < 10) {
-        return "0"+unit
-      }
-      return ""+unit
+    stopClock() {
+      this.$emit("stop-clock")
     }
   },
   watch: {
@@ -99,24 +102,42 @@ var app = new Vue({
     elapsedTime: 0,
   },
   methods: {
+    endCurrentTask(callback) {
+      var that = this
+      var task = {name: this.selectTask, startTime: this.startTime}
+      var date = new Date(task.startTime)
+      var dateFormat = date.getFullYear()+"/"+prettify(date.getMonth()+1)+"/"+prettify(date.getDate())
+      callback = callback ? callback : function(){}
+      chrome.storage.sync.get('history', function(data) {
+        var history = data.history ? data.history : {}
+        var dateContent = history[dateFormat] ? history[dateFormat] : {}
+        var taskCount = dateContent[task.name] ? dateContent[task.name] : 0
+        dateContent[task.name] = taskCount + that.getElapsedTime() / 1000
+        history[dateFormat] = dateContent
+        chrome.storage.sync.set({history:history},function(data){
+          chrome.storage.sync.set({task: {}},function(data){
+            that.selectedTask = ''
+            that.startTime = 0
+            console.log("clock icon");
+            callback()
+          })
+        })
+      });
+    },
     getElapsedTime(){
-      return Date.now() - this.startTime
+      if (this.startTime) {
+        return Date.now() - this.startTime
+      }
+      return 0
     },
     selectTask(task) {
+      var that = this
       if (task == this.selectTask){
         return
       }
-      var startTime = Date.now()
-      console.log("select task",task);
-      this.selectedTask = task
-      this.startTime = startTime
-      chrome.storage.sync.set({task:task}, function(data) {
-
-      });
-      chrome.storage.sync.set({time:startTime}, function(data) {
-
-      });
-      chrome.browserAction.setIcon({path: task+"-48.png"})
+      this.endCurrentTask(function(){
+        that.startTask(task)
+      })
     },
     setElapsedTime() {
       this.elapsedTime = this.getElapsedTime()
@@ -124,17 +145,19 @@ var app = new Vue({
     setTaskFromStorage() {
       var that = this
       chrome.storage.sync.get('task', function(data) {
-        if (data.task) {
-          that.selectedTask= data.task
+        var task = data.task
+        if (task) {
+          that.selectedTask= data.task.name
+          that.startTime = data.task.startTime
         }
       });
     },
-    setStartTimeFromStorage() {
-      var that = this
-      chrome.storage.sync.get('time', function(data) {
-        if (data.time) {
-          that.startTime = data.time
-        }
+    startTask(task) {
+      var startTime = Date.now()
+      this.selectedTask = task
+      this.startTime = startTime
+      chrome.storage.sync.set({task:{name: task, startTime: startTime}}, function(data) {
+
       });
     },
     updateElapsedTime(){
@@ -146,8 +169,19 @@ var app = new Vue({
   },
   beforeMount(){
     this.setTaskFromStorage()
-    this.setStartTimeFromStorage()
     this.updateElapsedTime();
+    chrome.storage.onChanged.addListener(function(changes, namespace) {
+      var task = changes.task
+      if (task) {
+        if (task.newValue.name) {
+          console.log("task icon");
+          chrome.browserAction.setIcon({path: task.newValue.name+"-48.png"})
+        } else {
+          console.log("clock icon");
+          chrome.browserAction.setIcon({path: "clock-48.png"})
+        }
+      }
+    });
     console.log("yoh");
   }
 })

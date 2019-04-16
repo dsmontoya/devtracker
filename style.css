@@ -8,13 +8,21 @@ body {
 }
 
 .clock {
+  width: 300px;
+  height: 20vh;
+  margin: 0 100px;
   font-size: 40px;
   text-align: center;
 }
 
+.clock div {
+  float: left;
+  margin: 25px 0;
+}
+
 .tasks{
   width: 400px;
-  height: 90vh;
+  height: 80vh;
   display: grid;
   grid-template-columns: auto auto;
 }

@@ -5,7 +5,7 @@
 <body>
   <div id="app">
     <tasks v-bind:selected-task="selectedTask" @select-task="selectTask"></tasks>
-    <stop-watch :elapsed-time=elapsedTime></stop-watch>
+    <stop-watch :elapsed-time=elapsedTime @stop-clock="endCurrentTask"></stop-watch>
   </div>
 </body>
 <script src="popup.js"></script>
