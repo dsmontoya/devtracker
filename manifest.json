@@ -1,5 +1,6 @@
 {
   "name": "Dev Tracker",
+  "short_name": "Dev Tracker",
   "version": "1.0",
   "description": "Track your development activities",
   "permissions": ["storage"],
