@@ -113,14 +113,14 @@ var app = new Vue({
   el: '#app',
   data: {
     message: 'Hello Vue!',
-    selectedTask: 'bffug',
+    selectedTask: '',
     startTime: 0,
     elapsedTime: 0,
   },
   methods: {
     endCurrentTask(callback) {
       var that = this
-      var task = {name: this.selectTask, startTime: this.startTime}
+      var task = {name: this.selectedTask, startTime: this.startTime}
       var date = new Date(task.startTime)
       var dateFormat = date.getFullYear()+"/"+prettify(date.getMonth()+1)+"/"+prettify(date.getDate())
       callback = callback ? callback : function(){}
@@ -148,7 +148,7 @@ var app = new Vue({
     },
     selectTask(task) {
       var that = this
-      if (task == this.selectTask){
+      if (task == this.selectedTask){
         return
       }
       this.endCurrentTask(function(){
