@@ -58,6 +58,22 @@ Vue.component('task', {
   }
 })
 
+Vue.component('report',{
+  template: '<div><a v-on:click.once="download">Download report</a></div>',
+  methods: {
+    download(event,data){
+      console.log("event",event);
+      console.log("data",data);
+      target = event.target
+      chrome.storage.sync.get("history",function(data){
+        target.href = "data:application/json;charset=utf-8,"+encodeURIComponent(JSON.stringify(data.history))
+        target.download = "tracker-report.json"
+        target.click()
+      })
+    }
+  }
+})
+
 Vue.component('stop-watch', {
   props:['elapsedTime'],
   data: function(){
