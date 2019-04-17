@@ -1,10 +1,8 @@
-console.log("lol")
 chrome.browserAction.setBadgeText({text:""},function(callback){})
 chrome.runtime.sendMessage({data:"Handshake"},function(response){
-  console.log("sent");
+
 });
 chrome.runtime.onMessage.addListener(function(message,sender,sendResponse){
-  console.log("new msg",message);
 	str = JSON.stringify(message.data);
 });
 
@@ -34,7 +32,6 @@ Vue.component('tasks', {
   },
   methods: {
     selectTask(value) {
-      console.log("hey 2",value,value);
       this.$emit('select-task',value)
     }
   }
@@ -52,7 +49,6 @@ Vue.component('task', {
   },
   methods: {
     selectTask(task) {
-      console.log("hey",task);
       this.$emit('select-task',task)
     }
   }
@@ -62,8 +58,6 @@ Vue.component('report',{
   template: '<div class="report" v-on:click="download"><div>Download report</div></div>',
   methods: {
     download(event,data){
-      console.log("event",event);
-      console.log("data",data);
       chrome.storage.sync.get("history",function(data){
         var element = document.createElement('a');
         element.style.display = 'none';
@@ -196,14 +190,11 @@ var app = new Vue({
       var task = changes.task
       if (task) {
         if (task.newValue.name) {
-          console.log("task icon");
           chrome.browserAction.setIcon({path: task.newValue.name+"-48.png"})
         } else {
-          console.log("clock icon");
           chrome.browserAction.setIcon({path: "clock-48.png"})
         }
       }
     });
-    console.log("yoh");
   }
 })
