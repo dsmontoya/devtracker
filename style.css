@@ -14,18 +14,31 @@ body {
 }
 
 .clock, .welcome-message{
-  height: 15vh;
+  height: 10vh;
   font-size: 40px;
 }
 
 .clock div {
   float: left;
-  margin: 20px 0;
+  margin: 5px 0;
+}
+
+.report{
+  height: 10vh;
+}
+
+.report div {
+  width: 100px;
+  float: left;
+  margin: 15px 150px;
+  text-decoration: underline;
+  text-align: center;
+  cursor: pointer;
 }
 
 .tasks{
   width: 400px;
-  height: 85vh;
+  height: 80vh;
   display: grid;
   grid-template-columns: auto auto;
 }
@@ -55,5 +68,5 @@ body {
 .welcome-message div{
   float: left;
   width: 280px;
-  margin: 20px 60px;
+  margin: 7px 60px;
 }
