@@ -59,16 +59,19 @@ Vue.component('task', {
 })
 
 Vue.component('report',{
-  template: '<div><a v-on:click.once="download">Download report</a></div>',
+  template: '<div class="report" v-on:click="download"><div>Download report</div></div>',
   methods: {
     download(event,data){
       console.log("event",event);
       console.log("data",data);
-      target = event.target
       chrome.storage.sync.get("history",function(data){
-        target.href = "data:application/json;charset=utf-8,"+encodeURIComponent(JSON.stringify(data.history))
-        target.download = "tracker-report.json"
-        target.click()
+        var element = document.createElement('a');
+        element.style.display = 'none';
+        element.href = "data:application/json;charset=utf-8,"+encodeURIComponent(JSON.stringify(data.history))
+        element.download = "tracker-report.json"
+        document.body.appendChild(element);
+        element.click()
+        document.body.removeChild(element)
       })
     }
   }
@@ -119,11 +122,15 @@ var app = new Vue({
   },
   methods: {
     endCurrentTask(callback) {
-      var that = this
+      callback = callback ? callback : function(){}
       var task = {name: this.selectedTask, startTime: this.startTime}
+      if (!task.name) {
+        callback()
+        return
+      }
+      var that = this
       var date = new Date(task.startTime)
       var dateFormat = date.getFullYear()+"/"+prettify(date.getMonth()+1)+"/"+prettify(date.getDate())
-      callback = callback ? callback : function(){}
       chrome.storage.sync.get('history', function(data) {
         var history = data.history ? data.history : {}
         var dateContent = history[dateFormat] ? history[dateFormat] : {}
@@ -134,7 +141,6 @@ var app = new Vue({
           chrome.storage.sync.set({task: {}},function(data){
             that.selectedTask = ''
             that.startTime = 0
-            console.log("clock icon");
             callback()
           })
         })
